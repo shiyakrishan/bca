@@ -4,55 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Student Attendance Record</title>
-<script>
-  const form = document.getElementById('attendanceForm');
-  const tableBody = document.querySelector('#attendanceTable tbody');
 
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
-
-    const name = document.getElementById('name').value;
-    const year = document.getElementById('year').value;
-    const semester = document.getElementById('semester').value;
-    const date = document.getElementById('date').value;
-    const inTime = document.getElementById('inTime').value;
-    const outTime = document.getElementById('outTime').value;
-
-    // Show in HTML table
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${name}</td>
-      <td>${year}</td>
-      <td>${semester}</td>
-      <td>${date}</td>
-      <td>${inTime}</td>
-      <td>${outTime}</td>
-    `;
-    tableBody.appendChild(row);
-
-    // Send to Google Sheet
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbxzxOnQ696GjecEx_t-7hzL8pgPbQCZonmA5Ph4OTjUgI5Qope9lhuZm2j17cmzAx7l/exec';
-
-    const formData = new FormData();
-    formData.append('name', name);
-    formData.append('Year', year);
-    formData.append('Semester', semester);
-    formData.append('Date', date);
-    formData.append('In time', inTime);
-    formData.append('Out time', outTime);
-
-    fetch(scriptURL, { method: 'POST', body: formData })
-      .then(response => {
-        alert("✅ Attendance submitted successfully!");
-        form.reset();
-      })
-      .catch(error => {
-        alert("❌ Error! Attendance not submitted.");
-        console.error("Error:", error);
-      });
-  });
-</script>
-
+  <!-- PDF Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
   <style>
     body {
@@ -160,14 +115,13 @@
     <form id="attendanceForm">
       <input type="text" id="name" placeholder="Student Name" required />
       <input type="date" id="date" required />
-      <input type="time" id="inTime" required />
-      <input type="time" id="outTime" required />
+      <input type="time" id="intime" required />
+      <input type="time" id="outtime" required />
       <select id="year" required>
         <option value="">Select Year</option>
         <option value="1st Year">1st Year</option>
         <option value="2nd Year">2nd Year</option>
         <option value="3rd Year">3rd Year</option>
-        <option value="4th Year">4th Year</option>
       </select>
       <select id="semester" required>
         <option value="">Select Semester</option>
@@ -177,8 +131,6 @@
         <option value="Semester 4">Semester 4</option>
         <option value="Semester 5">Semester 5</option>
         <option value="Semester 6">Semester 6</option>
-        <option value="Semester 7">Semester 7</option>
-        <option value="Semester 8">Semester 8</option>
       </select>
       <button type="submit">Mark Attendance</button>
     </form>
@@ -203,60 +155,77 @@
   </div>
 
   <script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbx30Zl17d6M5TGIshUW88ZTbw0IpUrt5pdyXgqQUOez1o4BNQdUS_a97QDELwRN9Vs0/exec';
     const form = document.getElementById('attendanceForm');
     const tableBody = document.querySelector('#attendanceTable tbody');
 
-    form.addEventListener('submit', function (e) {
+    form.addEventListener('submit', (e) => {
       e.preventDefault();
 
       const name = document.getElementById('name').value;
       const date = document.getElementById('date').value;
-      const inTime = document.getElementById('inTime').value;
-      const outTime = document.getElementById('outTime').value;
+      const intime = document.getElementById('intime').value;
+      const outtime = document.getElementById('outtime').value;
       const year = document.getElementById('year').value;
       const semester = document.getElementById('semester').value;
 
-      const row = document.createElement('tr');
-      row.innerHTML = `
+      // ✅ Add to HTML Table
+      const newRow = document.createElement('tr');
+      newRow.innerHTML = `
         <td>${name}</td>
         <td>${year}</td>
         <td>${semester}</td>
         <td>${date}</td>
-        <td>${inTime}</td>
-        <td>${outTime}</td>
+        <td>${intime}</td>
+        <td>${outtime}</td>
       `;
+      tableBody.appendChild(newRow);
 
-      tableBody.appendChild(row);
-      form.reset();
+      // ✅ Send to Google Sheet
+      const formData = new FormData();
+      formData.append('name', name);
+      formData.append('Year', year);
+      formData.append('Semester', semester);
+      formData.append('Date', date);
+      formData.append('In time', intime);
+      formData.append('Out time', outtime);
+
+      fetch(scriptURL, {
+        method: 'POST',
+        body: formData
+      })
+        .then(response => {
+          alert('✅ Attendance submitted successfully!');
+          form.reset();
+        })
+        .catch(error => {
+          alert('❌ Submission failed: ' + error.message);
+        });
     });
 
+    // ✅ PDF Download
     function downloadPDF() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
-      doc.text("Student Attendance Record", 20, 10);
 
-      const table = document.getElementById('attendanceTable');
-      let rows = [];
-      const headers = [...table.querySelectorAll('th')].map(th => th.innerText);
-      const dataRows = table.querySelectorAll('tbody tr');
+      doc.text("Student Attendance", 20, 10);
+      const headers = [["Name", "Year", "Semester", "Date", "In Time", "Out Time"]];
+      const rows = [];
 
-      dataRows.forEach(tr => {
-        const row = [...tr.querySelectorAll('td')].map(td => td.innerText);
+      document.querySelectorAll("#attendanceTable tbody tr").forEach(tr => {
+        const row = [];
+        tr.querySelectorAll("td").forEach(td => row.push(td.innerText));
         rows.push(row);
       });
 
       doc.autoTable({
-        head: [headers],
+        head: headers,
         body: rows,
-        startY: 20,
-        theme: 'grid'
+        startY: 20
       });
 
-      doc.save('Attendance_Record.pdf');
+      doc.save("Attendance.pdf");
     }
   </script>
-
-  <!-- jsPDF AutoTable Plugin -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 </body>
 </html>
