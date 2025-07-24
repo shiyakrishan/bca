@@ -4,7 +4,85 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Student Attendance Record</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+  const form = document.getElementById('attendanceForm');
+  const tableBody = document.querySelector('#attendanceTable tbody');
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const name = document.getElementById('name').value;
+    const date = document.getElementById('date').value;
+    const inTime = document.getElementById('inTime').value;
+    const outTime = document.getElementById('outTime').value;
+    const year = document.getElementById('year').value;
+    const semester = document.getElementById('semester').value;
+
+    // ✅ Local Table me Add karna
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${name}</td>
+      <td>${year}</td>
+      <td>${semester}</td>
+      <td>${date}</td>
+      <td>${inTime}</td>
+      <td>${outTime}</td>
+    `;
+    tableBody.appendChild(row);
+
+    // ✅ Google Sheet me Save karna
+    fetch("https://script.google.com/macros/s/AKfycbxzxOnQ696GjecEx_t-7hzL8pgPbQCZonmA5Ph4OTjUgI5Qope9lhuZm2j17cmzAx7l/exec", {
+      method: "POST",
+      body: JSON.stringify({
+        name: name,
+        date: date,
+        inTime: inTime,
+        outTime: outTime,
+        year: year,
+        semester: semester
+      }),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    .then(res => res.text())
+    .then(data => {
+      alert("✅ Attendance saved to sheet successfully!");
+      form.reset();
+    })
+    .catch(err => {
+      console.error("❌ Error saving to sheet:", err);
+      alert("❌ Something went wrong!");
+    });
+  });
+
+  // ✅ Download PDF
+  function downloadPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.text("Student Attendance Record", 20, 10);
+
+    const table = document.getElementById('attendanceTable');
+    let rows = [];
+    const headers = [...table.querySelectorAll('th')].map(th => th.innerText);
+    const dataRows = table.querySelectorAll('tbody tr');
+
+    dataRows.forEach(tr => {
+      const row = [...tr.querySelectorAll('td')].map(td => td.innerText);
+      rows.push(row);
+    });
+
+    doc.autoTable({
+      head: [headers],
+      body: rows,
+      startY: 20,
+      theme: 'grid'
+    });
+
+    doc.save('Attendance_Record.pdf');
+  }
+</script>
+
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
