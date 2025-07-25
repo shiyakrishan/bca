@@ -1,109 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>BCA Lab Attendance</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #e9f0f5;
-      padding: 20px;
+      font-family: Arial, sans-serif;
+      background-color: #edf2f7;
       margin: 0;
+      padding: 0;
     }
-
     .container {
-      max-width: 800px;
-      margin: 0 auto;
+      max-width: 700px;
+      margin: 40px auto;
       background: white;
       padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-
-    h2 {
+    h1 {
       text-align: center;
-      color: #123c69;
-      margin-bottom: 30px;
+      color: #1a202c;
     }
-
+    .form-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
     input, select, button {
-      width: 100%;
       padding: 10px;
-      margin-bottom: 15px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
       font-size: 16px;
+      width: 100%;
+      border-radius: 5px;
+      border: 1px solid #ccc;
     }
-
     button {
       background-color: #28a745;
       color: white;
       border: none;
-      cursor: pointer;
+      font-weight: bold;
     }
-
-    button:hover {
-      background-color: #218838;
-    }
-
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 25px;
+      margin-top: 30px;
     }
-
-    table, th, td {
-      border: 1px solid #ccc;
-    }
-
-    th {
-      background-color: #2163af;
-      color: white;
+    th, td {
+      border: 1px solid #dee2e6;
       padding: 10px;
-    }
-
-    td {
-      padding: 8px;
       text-align: center;
     }
-
-    @media (min-width: 600px) {
-      .grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 15px;
-      }
+    th {
+      background-color: #2b6cb0;
+      color: white;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>BCA Lab Attendance</h2>
-    <div class="grid">
-      <input type="text" id="name" placeholder="Student Name" required>
-      <input type="date" id="date" required>
-      <input type="time" id="inTime" required>
-      <input type="time" id="outTime" required>
+    <h1>BCA Lab Attendance</h1>
+    <div class="form-group">
+      <input type="text" id="name" placeholder="Student Name" required />
+      <input type="date" id="date" required />
+      <input type="time" id="inTime" required />
+      <input type="time" id="outTime" required />
       <select id="year" required>
         <option value="">Select Year</option>
-        <option value="1st Year">1st Year</option>
-        <option value="2nd Year">2nd Year</option>
-        <option value="3rd Year">3rd Year</option>
+        <option>1st Year</option>
+        <option>2nd Year</option>
+        <option>3rd Year</option>
       </select>
       <select id="semester" required>
         <option value="">Select Semester</option>
-        <option value="Semester 1">Semester 1</option>
-        <option value="Semester 2">Semester 2</option>
-        <option value="Semester 3">Semester 3</option>
-        <option value="Semester 4">Semester 4</option>
-        <option value="Semester 5">Semester 5</option>
-        <option value="Semester 6">Semester 6</option>
+        <option>Semester 1</option>
+        <option>Semester 2</option>
+        <option>Semester 3</option>
+        <option>Semester 4</option>
+        <option>Semester 5</option>
+        <option>Semester 6</option>
       </select>
     </div>
-    <button onclick="submitForm()">Save Record</button>
+    <button onclick="saveRecord()">Save Record</button>
 
-    <table id="recordTable">
+    <table id="attendanceTable">
       <thead>
         <tr>
           <th>Name</th>
@@ -114,60 +95,49 @@
           <th>Out Time</th>
         </tr>
       </thead>
-      <tbody id="tableBody">
-        <!-- Records will appear here -->
-      </tbody>
+      <tbody></tbody>
     </table>
   </div>
 
   <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbx30Zl17d6M5TGIshUW88ZTbw0IpUrt5pdyXgqQUOez1o4BNQdUS_a97QDELwRN9Vs0/exec";
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbytksFitld8Tp2Z_UljJ5pZsQLsDWLEX16g7-DOfc_qzBhD2UuJX5qBHf7y273E2Y4G/exec';
 
-    function submitForm() {
-      const name = document.getElementById("name").value.trim();
-      const year = document.getElementById("year").value;
-      const semester = document.getElementById("semester").value;
-      const date = document.getElementById("date").value;
-      const inTime = document.getElementById("inTime").value;
-      const outTime = document.getElementById("outTime").value;
+    function saveRecord() {
+      const name = document.getElementById('name').value;
+      const date = document.getElementById('date').value;
+      const inTime = document.getElementById('inTime').value;
+      const outTime = document.getElementById('outTime').value;
+      const year = document.getElementById('year').value;
+      const semester = document.getElementById('semester').value;
 
-      if (!name || !year || !semester || !date || !inTime || !outTime) {
-        alert("Please fill all fields.");
+      if (!name || !date || !inTime || !outTime || !year || !semester) {
+        alert("Please fill all fields!");
         return;
       }
 
-      const formData = {
-        name,
-        year,
-        semester,
-        date,
-        inTime,
-        outTime
-      };
+      const data = { name, date, inTime, outTime, year, semester };
 
       fetch(scriptURL, {
-        method: "POST",
-        body: JSON.stringify(formData),
-        headers: {
-          "Content-Type": "application/json"
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: { 'Content-Type': 'application/json' }
+      })
+      .then(response => response.text())
+      .then(res => {
+        if (res === 'Success') {
+          alert('Attendance Saved!');
+          appendToTable(data);
+        } else {
+          alert('Something went wrong: ' + res);
         }
       })
-      .then(response => {
-        alert("Record saved successfully!");
-        addToTable(formData);
-        clearForm();
-      })
-      .catch(error => {
-        console.error("Error!", error.message);
-        alert("Failed to save record.");
-      });
+      .catch(err => alert('Error: ' + err));
     }
 
-    function addToTable(data) {
-      const tableBody = document.getElementById("tableBody");
-      const row = document.createElement("tr");
-
-      row.innerHTML = `
+    function appendToTable(data) {
+      const table = document.getElementById('attendanceTable').getElementsByTagName('tbody')[0];
+      const newRow = table.insertRow();
+      newRow.innerHTML = `
         <td>${data.name}</td>
         <td>${data.year}</td>
         <td>${data.semester}</td>
@@ -175,17 +145,6 @@
         <td>${data.inTime}</td>
         <td>${data.outTime}</td>
       `;
-
-      tableBody.appendChild(row);
-    }
-
-    function clearForm() {
-      document.getElementById("name").value = "";
-      document.getElementById("year").value = "";
-      document.getElementById("semester").value = "";
-      document.getElementById("date").value = "";
-      document.getElementById("inTime").value = "";
-      document.getElementById("outTime").value = "";
     }
   </script>
 </body>
