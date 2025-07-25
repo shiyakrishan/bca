@@ -1,115 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF‑8"><meta name="viewport" content="width=device‑width,initial‑scale=1.0">
   <title>BCA Lab Attendance</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #edf2f7;
-      margin: 0;
-      padding: 0;
-    }
-    .container {
-      max-width: 700px;
-      margin: 40px auto;
-      background: white;
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    h1 {
-      text-align: center;
-      color: #1a202c;
-    }
-    .form-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-    input, select, button {
-      padding: 10px;
-      font-size: 16px;
-      width: 100%;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-    button {
-      background-color: #28a745;
-      color: white;
-      border: none;
-      font-weight: bold;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 30px;
-    }
-    th, td {
-      border: 1px solid #dee2e6;
-      padding: 10px;
-      text-align: center;
-    }
-    th {
-      background-color: #2b6cb0;
-      color: white;
-    }
-  </style>
+  <style>/* same CSS as before */</style>
 </head>
 <body>
-  <div class="container">
-    <h1>BCA Lab Attendance</h1>
-    <div class="form-group">
-      <input type="text" id="name" placeholder="Student Name" required />
-      <input type="date" id="date" required />
-      <input type="time" id="inTime" required />
-      <input type="time" id="outTime" required />
-      <select id="year" required>
-        <option value="">Select Year</option>
-        <option>1st Year</option>
-        <option>2nd Year</option>
-        <option>3rd Year</option>
-      </select>
-      <select id="semester" required>
-        <option value="">Select Semester</option>
-        <option>Semester 1</option>
-        <option>Semester 2</option>
-        <option>Semester 3</option>
-        <option>Semester 4</option>
-        <option>Semester 5</option>
-        <option>Semester 6</option>
-      </select>
-    </div>
-    <button onclick="saveRecord()">Save Record</button>
-
-    <table id="attendanceTable">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Year</th>
-          <th>Semester</th>
-          <th>Date</th>
-          <th>In Time</th>
-          <th>Out Time</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-
+  <!-- container & form same as before -->
   <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbytksFitld8Tp2Z_UljJ5pZsQLsDWLEX16g7-DOfc_qzBhD2UuJX5qBHf7y273E2Y4G/exec';
 
-    function saveRecord() {
-      const name = document.getElementById('name').value;
-      const date = document.getElementById('date').value;
-      const inTime = document.getElementById('inTime').value;
-      const outTime = document.getElementById('outTime').value;
-      const year = document.getElementById('year').value;
-      const semester = document.getElementById('semester').value;
-
+    async function saveRecord() {
+      // gather inputs ...
       if (!name || !date || !inTime || !outTime || !year || !semester) {
         alert("Please fill all fields!");
         return;
@@ -117,35 +19,26 @@
 
       const data = { name, date, inTime, outTime, year, semester };
 
-      fetch(scriptURL, {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers: { 'Content-Type': 'application/json' }
-      })
-      .then(response => response.text())
-      .then(res => {
-        if (res === 'Success') {
+      try {
+        const res = await fetch(scriptURL, {
+          method: 'POST',
+          body: JSON.stringify(data),
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' } // IMPORTANT
+        });
+
+        const text = await res.text();
+        if (text.includes('Success')) {
           alert('Attendance Saved!');
           appendToTable(data);
         } else {
-          alert('Something went wrong: ' + res);
+          alert('Server returned: ' + text);
         }
-      })
-      .catch(err => alert('Error: ' + err));
+      } catch(err) {
+        console.error(err);
+        alert('Fetch Error: ' + err.message);
+      }
     }
-
-    function appendToTable(data) {
-      const table = document.getElementById('attendanceTable').getElementsByTagName('tbody')[0];
-      const newRow = table.insertRow();
-      newRow.innerHTML = `
-        <td>${data.name}</td>
-        <td>${data.year}</td>
-        <td>${data.semester}</td>
-        <td>${data.date}</td>
-        <td>${data.inTime}</td>
-        <td>${data.outTime}</td>
-      `;
-    }
+    // appendToTable logic same
   </script>
 </body>
 </html>
