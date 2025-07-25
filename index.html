@@ -1,44 +1,188 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF‑8"><meta name="viewport" content="width=device‑width,initial‑scale=1.0">
+  <meta charset="UTF-8">
   <title>BCA Lab Attendance</title>
-  <style>/* same CSS as before */</style>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      padding: 20px;
+    }
+    .container {
+      max-width: 500px;
+      background: #fff;
+      margin: auto;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #ccc;
+    }
+    h2 {
+      text-align: center;
+    }
+    label {
+      font-weight: bold;
+      margin-top: 10px;
+      display: block;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      width: 100%;
+      background-color: #007b33;
+      color: white;
+      border: none;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #005e27;
+    }
+    table {
+      width: 100%;
+      margin-top: 30px;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ccc;
+      text-align: center;
+    }
+    th {
+      background-color: #eee;
+    }
+  </style>
 </head>
 <body>
-  <!-- container & form same as before -->
+  <div class="container">
+    <h2>BCA Lab Attendance</h2>
+    <label>Name:</label>
+    <input type="text" id="name" placeholder="Enter your name" />
+
+    <label>Date:</label>
+    <input type="date" id="date" />
+
+    <label>In Time:</label>
+    <input type="time" id="inTime" />
+
+    <label>Out Time:</label>
+    <input type="time" id="outTime" />
+
+    <label>Year:</label>
+    <select id="year">
+      <option value="">Select Year</option>
+      <option value="1st Year">1st Year</option>
+      <option value="2nd Year">2nd Year</option>
+      <option value="3rd Year">3rd Year</option>
+    </select>
+
+    <label>Semester:</label>
+    <select id="semester">
+      <option value="">Select Semester</option>
+      <option value="Semester 1">Semester 1</option>
+      <option value="Semester 2">Semester 2</option>
+      <option value="Semester 3">Semester 3</option>
+      <option value="Semester 4">Semester 4</option>
+      <option value="Semester 5">Semester 5</option>
+      <option value="Semester 6">Semester 6</option>
+    </select>
+
+    <button onclick="saveRecord()">Save Record</button>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Year</th>
+          <th>Semester</th>
+          <th>Date</th>
+          <th>In Time</th>
+          <th>Out Time</th>
+        </tr>
+      </thead>
+      <tbody id="recordTable"></tbody>
+    </table>
+  </div>
+
   <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbytksFitld8Tp2Z_UljJ5pZsQLsDWLEX16g7-DOfc_qzBhD2UuJX5qBHf7y273E2Y4G/exec';
 
     async function saveRecord() {
-      // gather inputs ...
+      const name = document.getElementById("name").value.trim();
+      const date = document.getElementById("date").value;
+      const inTime = document.getElementById("inTime").value;
+      const outTime = document.getElementById("outTime").value;
+      const year = document.getElementById("year").value;
+      const semester = document.getElementById("semester").value;
+
       if (!name || !date || !inTime || !outTime || !year || !semester) {
         alert("Please fill all fields!");
         return;
       }
 
-      const data = { name, date, inTime, outTime, year, semester };
+      const data = {
+        name,
+        year,
+        semester,
+        date,
+        inTime,
+        outTime
+      };
 
       try {
         const res = await fetch(scriptURL, {
           method: 'POST',
-          body: JSON.stringify(data),
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' } // IMPORTANT
+          headers: {
+            'Content-Type': 'text/plain;charset=utf-8'
+          },
+          body: JSON.stringify(data)
         });
 
         const text = await res.text();
-        if (text.includes('Success')) {
-          alert('Attendance Saved!');
+
+        if (text.includes("Success")) {
+          alert("Record Saved!");
           appendToTable(data);
+          clearForm();
         } else {
-          alert('Server returned: ' + text);
+          alert("Server Response: " + text);
         }
-      } catch(err) {
-        console.error(err);
-        alert('Fetch Error: ' + err.message);
+      } catch (error) {
+        console.error(error);
+        alert("Something went wrong!");
       }
     }
-    // appendToTable logic same
+
+    function appendToTable(data) {
+      const table = document.getElementById("recordTable");
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${data.name}</td>
+        <td>${data.year}</td>
+        <td>${data.semester}</td>
+        <td>${data.date}</td>
+        <td>${data.inTime}</td>
+        <td>${data.outTime}</td>
+      `;
+      table.appendChild(row);
+    }
+
+    function clearForm() {
+      document.getElementById("name").value = "";
+      document.getElementById("date").value = "";
+      document.getElementById("inTime").value = "";
+      document.getElementById("outTime").value = "";
+      document.getElementById("year").value = "";
+      document.getElementById("semester").value = "";
+    }
   </script>
 </body>
 </html>
