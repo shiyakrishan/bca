@@ -3,12 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>BCA Lab Timing Record</title>
-
+  <title>BCA Lab Attendance</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #f0f4f8;
+      background: #eef3f7;
       margin: 0;
       padding: 20px;
     }
@@ -44,7 +43,7 @@
 
     button {
       grid-column: span 2;
-      background: #2ecc71;
+      background: #27ae60;
       color: white;
       border: none;
       cursor: pointer;
@@ -52,7 +51,7 @@
     }
 
     button:hover {
-      background: #27ae60;
+      background: #219150;
     }
 
     table {
@@ -143,7 +142,7 @@
       const year = document.getElementById('year').value;
       const semester = document.getElementById('semester').value;
 
-      // Add to Table
+      // Add to Table (frontend only)
       const newRow = document.createElement('tr');
       newRow.innerHTML = `
         <td>${name}</td>
